@@ -20,14 +20,17 @@ const dataList = reactive<Item[]>([
   { type: "Vegetable", name: "Carrot" },
 ]);
 
-const fruitColumn = reactive<Item[]>([]);
-const vegetableColumn = reactive<Item[]>([]);
+const fruitColumn = ref<Item[]>([]);
+const vegetableColumn = ref<Item[]>([]);
 
 function moveToColumn(item: Item) {
   const targetColumn = item.type === "Fruit" ? fruitColumn : vegetableColumn;
-  targetColumn.push(item);
 
-  const index = dataList.indexOf(item);
+  if (targetColumn.value.some((i) => i.name === item.name)) return;
+
+  targetColumn.value.push(item);
+
+  const index = dataList.findIndex((i) => i.name === item.name);
   if (index > -1) {
     dataList.splice(index, 1);
   }
@@ -36,11 +39,14 @@ function moveToColumn(item: Item) {
 }
 
 function moveBackToMain(item: Item) {
+  if (dataList.some((i) => i.name === item.name)) return;
+
   dataList.push(item);
+
   const targetColumn = item.type === "Fruit" ? fruitColumn : vegetableColumn;
-  const index = targetColumn.indexOf(item);
+  const index = targetColumn.value.findIndex((i) => i.name === item.name);
   if (index > -1) {
-    targetColumn.splice(index, 1);
+    targetColumn.value.splice(index, 1);
   }
 }
 </script>
